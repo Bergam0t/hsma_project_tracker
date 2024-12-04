@@ -147,8 +147,8 @@ st.write("*Choose between 'Quick' for a simple one-box project log template, or 
 
 project_form_simple, project_form_structured = st.tabs(["Quick", "Structured"])
 
-with project_form_simple:
-
+@st.fragment
+def project_form_simple_f():
     col_form_left, col_form_right = st.columns([0.7, 0.3])
 
     with col_form_right:
@@ -203,8 +203,8 @@ with project_form_simple:
 
         message
 
-
-
+with project_form_simple:
+    project_form_simple_f()
 
 def run_structured_submit():
     # key_progress_log, key_meetings_log, additional_notes_log
@@ -299,7 +299,9 @@ def run_structured_submit():
                             message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
 
 
-with project_form_structured:
+@st.fragment
+def project_form_structured_f():
+
     key_progress, bs1, key_meetings, bs2, additional_notes = st.columns([0.3,0.05,0.3,0.05,0.3])
 
     key_progress.write("#### Project Progress")
@@ -355,3 +357,7 @@ with project_form_structured:
                                               on_click=run_structured_submit)
 
     message
+
+
+with project_form_structured:
+    project_form_structured_f()
