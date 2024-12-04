@@ -36,14 +36,15 @@ hsma_proj_reg_df = hsma_proj_reg_df.sort_values("Project Code")
 hsma_proj_reg_df["Full Project Title"] = hsma_proj_reg_df["Project Code"].astype('str') + ": " + hsma_proj_reg_df["Project Title"]
 hsma_proj_reg_df["Full Project Title and Leads"] = hsma_proj_reg_df["Full Project Title"] + " (" + hsma_proj_reg_df["Lead"] + ")"
 
+project_list = ["Please Select a Project"]
+project_list =  project_list + hsma_proj_reg_df['Full Project Title and Leads'].tolist()
+
 # st.dataframe(hsma_proj_reg_df)
 
 message = ""
 
 # Title for app
 st.title("Welcome to the HSMA Project Progress Tracker")
-
-project_form_simple, project_form_structured = st.tabs(["Quick", "Structured"])
 
 def celebrate():
     if datetime.now().month == 12:
@@ -127,12 +128,7 @@ def run_simple_submit():
                         sleep(2)
                 message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
 
-with project_form_simple:
-
-    project_list = ["Please Select a Project"]
-    project_list =  project_list + hsma_proj_reg_df['Full Project Title and Leads'].tolist()
-
-    st.session_state.project = st.selectbox(
+st.session_state.project = st.selectbox(
             """**What Project Does this Relate to?**
             \n\nStart typing a project code, title or team member to filter the project list, or scroll down to find your project.
             """,
@@ -140,19 +136,22 @@ with project_form_simple:
             help="Note that only projects that have been registered via the 'new project airlock' channel on Slack will appear in this list."
         )
 
-    if st.session_state.project != "Please Select a Project":
-        st.session_state.project_code = hsma_proj_reg_df[hsma_proj_reg_df['Full Project Title and Leads'] == st.session_state.project]['Project Code'].values[0]
-    else:
-        st.session_state.project_code = None
+if st.session_state.project != "Please Select a Project":
+    st.session_state.project_code = hsma_proj_reg_df[hsma_proj_reg_df['Full Project Title and Leads'] == st.session_state.project]['Project Code'].values[0]
+else:
+    st.session_state.project_code = None
 
-    col_form_left, col_form_right = st.columns([0.3, 0.7])
-
-    with col_form_left:
-        st.session_state.submitter_name = st.text_input(
+st.session_state.submitter_name = st.text_input(
             "**What's your name?**\n\n*Please include your first name and surname*"
         )
 
-        st.write("---")
+project_form_simple, project_form_structured = st.tabs(["Quick", "Structured"])
+
+with project_form_simple:
+
+    col_form_left, col_form_right = st.columns([0.7, 0.3])
+
+    with col_form_right:
 
         st.write("*Example Updates*")
 
@@ -187,7 +186,7 @@ with project_form_simple:
                         """
                         )
 
-    with col_form_right:
+    with col_form_left:
         # pass
         # update_date = st.date_input(
         #     "Please Enter the Date of the Update"
@@ -199,7 +198,7 @@ with project_form_simple:
                                         """,
                                         height=400)
 
-        blurb_submitted = st.button("Submit Update", type='primary', disabled=False,
+        submit_simple_project_log = st.button("Submit Update", type='primary', disabled=False,
                                                 on_click=run_simple_submit)
 
         message
