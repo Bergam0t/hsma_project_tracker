@@ -102,7 +102,7 @@ def run_simple_submit():
                 # print("Error encountered while trying to write to ProjectLogs table.")
                 print("Trying again...")
                 i = 1
-                while i<=10:
+                while i<=30:
                     try:
                         entry_dict['id'] += 1
                         print(f"Retrying with id {entry_dict['id']} - retry {i}")
@@ -125,8 +125,8 @@ def run_simple_submit():
                         error_message = str(e)
                         print(f"Error occurred: {error_message}")
                         i += 1
-                        sleep(2)
-                message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
+                        sleep(0.5)
+                    message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
 
 st.session_state.project = st.selectbox(
             """**What Project Does this Relate to?**
@@ -252,54 +252,57 @@ def run_structured_submit():
                             "entry_type": box["entry_type"],
                             "entry": box["entry"]
                         }
+                id_for_entry += 1
 
-                try:
-                    print(f"Attempting to write as entry {id_for_entry}")
-                    response = (
-                        supabase.table("ProjectLogs").insert(entry_dict).execute()
-                    )
-                    if response.data:
-                        print("Successfully written to ProjectLogs table on first try")
-                        message = st.success(f"""
-                                            Project Log Submitted Successfully!
-                                            \n\n**Project**: {st.session_state.project_code}
-                                            \n\n**Submitter**: {st.session_state.submitter_name}
-                                            \n\n**Log**: {box["entry"]}
-                                            """)
-                        celebrate()
-                    else:
-                        raise Exception(response.error.message)
-                except Exception as e:
-                    error_message = str(e)
-                    print(f"Error occurred: {error_message}")
-                    # print("Error encountered while trying to write to ProjectLogs table.")
-                    print("Trying again...")
-                    i = 1
-                    while i<=10:
-                        try:
-                            entry_dict['id'] += 1
-                            print(f"Retrying with id {entry_dict['id']} - retry {i}")
-                            response = (
-                                supabase.table("ProjectLogs").insert(entry_dict).execute()
-                            )
-                            if response.data:
-                                print(f"Successfully written on retry {i}")
-                                message = st.success(f"""
-                                            Project Log Submitted Successfully!
-                                            \n\n**Project**: {st.session_state.project_code}
-                                            \n\n**Submitter**: {st.session_state.submitter_name}
-                                            \n\n**Log**: {st.session_state.project_update}
-                                            """)
-                                celebrate()
-                            else:
-                                raise Exception(response.error.message)
-                            break
-                        except Exception as e:
-                            error_message = str(e)
-                            print(f"Error occurred: {error_message}")
-                            i += 1
-                            sleep(2)
-                        message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
+                if box["entry"] != "":
+                    try:
+                        print(f"Attempting to write as entry {id_for_entry}")
+                        response = (
+                            supabase.table("ProjectLogs").insert(entry_dict).execute()
+                        )
+                        if response.data:
+                            print("Successfully written to ProjectLogs table on first try")
+                            message = st.success(f"""
+                                                Project Log Submitted Successfully!
+                                                \n\n**Project**: {st.session_state.project_code}
+                                                \n\n**Submitter**: {st.session_state.submitter_name}
+                                                \n\n**Log**: {box["entry"]}
+                                                """)
+                            celebrate()
+                        else:
+                            raise Exception(response.error.message)
+                    except Exception as e:
+                        error_message = str(e)
+                        print(f"Error occurred: {error_message}")
+                        # print("Error encountered while trying to write to ProjectLogs table.")
+                        print("Trying again...")
+                        i = 1
+                        while i<=10:
+                            try:
+                                id_for_entry += 1
+                                entry_dict['id'] += 1
+                                print(f"Retrying with id {entry_dict['id']} - retry {i}")
+                                response = (
+                                    supabase.table("ProjectLogs").insert(entry_dict).execute()
+                                )
+                                if response.data:
+                                    print(f"Successfully written on retry {i}")
+                                    message = st.success(f"""
+                                                Project Log Submitted Successfully!
+                                                \n\n**Project**: {st.session_state.project_code}
+                                                \n\n**Submitter**: {st.session_state.submitter_name}
+                                                \n\n**Log**: {box["entry"]}
+                                                """)
+                                    celebrate()
+                                else:
+                                    raise Exception(response.error.message)
+                                break
+                            except Exception as e:
+                                error_message = str(e)
+                                print(f"Error occurred: {error_message}")
+                                i += 1
+                                sleep(0.5)
+                            message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
 
 
 with project_form_structured:
