@@ -8,6 +8,9 @@ import pandas as pd
 st.set_page_config(layout="wide",
                    page_title="HSMA Project Progress Reporter")
 
+with open("style.css") as css:
+    st.markdown(f'<style>{css.read()}</style>', unsafe_allow_html=True)
+
 # Create a Google Sheets Connection
 gs_conn = st.connection("gsheets", type=GSheetsConnection)
 

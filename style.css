@@ -1,0 +1,6 @@
+.block-container {
+    width: 100%;
+    padding: 4rem 2rem 2rem;
+    min-width: auto;
+    max-width: initial;
+}
