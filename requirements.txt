@@ -2,7 +2,7 @@ pandas==2.2.2
 numpy==1.26.4
 simpy==4.0.2
 matplotlib==3.9.1.post1
-streamlit==1.37.0
+streamlit==1.40.2
 ipykernel==6.29.5
 ipython==8.27.0
 openpyxl
