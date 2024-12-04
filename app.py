@@ -126,7 +126,7 @@ def run_simple_submit():
                         print(f"Error occurred: {error_message}")
                         i += 1
                         sleep(0.5)
-                    message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
+                        message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
 
 st.session_state.project = st.selectbox(
             """**What Project Does this Relate to?**
@@ -302,7 +302,7 @@ def run_structured_submit():
                                 print(f"Error occurred: {error_message}")
                                 i += 1
                                 sleep(0.5)
-                            message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
+                                message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
 
 
 with project_form_structured:
