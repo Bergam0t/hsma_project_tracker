@@ -45,6 +45,12 @@ st.title("Welcome to the HSMA Project Progress Tracker")
 
 project_form_simple, project_form_structured = st.tabs(["Quick", "Structured"])
 
+def celebrate():
+    if datetime.now().month == 12:
+        st.snow()
+    else:
+        st.balloons()
+
 def run_simple_submit():
     print(f"Project Code: {st.session_state.project_code}")
     print(f"Submitter: {st.session_state.submitter_name}")
@@ -86,7 +92,7 @@ def run_simple_submit():
                                          \n\n**Submitter**: {st.session_state.submitter_name}
                                          \n\n**Log**: {st.session_state.project_update}
                                          """)
-                    st.balloons()
+                    celebrate()
                 else:
                     raise Exception(response.error.message)
             except Exception as e:
@@ -110,7 +116,7 @@ def run_simple_submit():
                                          \n\n**Submitter**: {st.session_state.submitter_name}
                                          \n\n**Log**: {st.session_state.project_update}
                                          """)
-                            st.balloons()
+                            celebrate()
                         else:
                             raise Exception(response.error.message)
                         break
