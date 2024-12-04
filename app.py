@@ -58,21 +58,19 @@ def run_simple_submit():
     print(f"Update: {st.session_state.project_update}")
     if st.session_state.project_code is None:
         message = st.warning("Please select a project before submitting")
+        print("==Not submitted - project not selected==")
     elif st.session_state.submitter_name == "":
         message = st.warning("Please enter your name before submitting")
+        print("==Not submitted - name not entered==")
     elif st.session_state.project_update == "":
         message = st.warning("Please enter your update before submitting")
+        print("==Not submitted - no update entered==")
     else:
         rows = run_query_main()
 
         with st.spinner("Submitting Log..."):
 
-            id_of_latest_entry = rows.data[(len(rows.data) - 1)]['id']
-            id_for_entry = id_of_latest_entry + 1
-            print(f"ID of latest entry: {id_of_latest_entry}")
-
             entry_dict = {
-                        "id":id_for_entry,
                         "created_at": datetime.now(timezone.utc).isoformat(),
                         "project_code": int(st.session_state.project_code), # Ensure not passing as int64, which table will reject
                         "submitter": st.session_state.submitter_name,
@@ -81,7 +79,7 @@ def run_simple_submit():
                     }
 
             try:
-                print(f"Attempting to write as entry {id_for_entry}")
+                print(f"Attempting to write")
                 response = (
                     supabase.table("ProjectLogs").insert(entry_dict).execute()
                 )
@@ -104,8 +102,7 @@ def run_simple_submit():
                 i = 1
                 while i<=30:
                     try:
-                        entry_dict['id'] += 1
-                        print(f"Retrying with id {entry_dict['id']} - retry {i}")
+                        print(f"Retry {i}")
                         response = (
                             supabase.table("ProjectLogs").insert(entry_dict).execute()
                         )
@@ -126,7 +123,8 @@ def run_simple_submit():
                         print(f"Error occurred: {error_message}")
                         i += 1
                         sleep(0.5)
-                        message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
+                else:
+                    message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
 
 st.session_state.project = st.selectbox(
             """**What Project Does this Relate to?**
@@ -216,8 +214,10 @@ def run_structured_submit():
 
     if st.session_state.project_code is None:
         message = st.warning("Please select a project before submitting")
+        print("==Not submitted - project not selected==")
     elif st.session_state.submitter_name == "":
         message = st.warning("Please enter your name before submitting")
+        print("==Not submitted - name not entered==")
     elif (st.session_state.key_progress_log == "" and
           st.session_state.key_meetings_log == "" and
           st.session_state.additional_notes_log == "" and
@@ -225,14 +225,11 @@ def run_structured_submit():
           st.session_state.key_planned_activities_log == "" and
           st.session_state.other_comments_log == ""):
         message = st.warning("Please enter an update in at least one box before submitting")
+        print("==Not submitted - no update entered==")
     else:
         rows = run_query_main()
 
         with st.spinner("Submitting Log..."):
-
-            id_of_latest_entry = rows.data[(len(rows.data) - 1)]['id']
-            id_for_entry = id_of_latest_entry + 1
-            print(f"ID of latest entry: {id_of_latest_entry}")
 
             structured_log_dict = [
                 {"entry_type": "Structured Log - Progress", "entry": st.session_state.key_progress_log},
@@ -245,18 +242,16 @@ def run_structured_submit():
 
             for box in structured_log_dict:
                 entry_dict = {
-                            "id":id_for_entry,
                             "created_at": datetime.now(timezone.utc).isoformat(),
                             "project_code": int(st.session_state.project_code), # Ensure not passing as int64, which table will reject
                             "submitter": st.session_state.submitter_name,
                             "entry_type": box["entry_type"],
                             "entry": box["entry"]
                         }
-                id_for_entry += 1
 
                 if box["entry"] != "":
                     try:
-                        print(f"Attempting to write as entry {id_for_entry}")
+                        print(f"Attempting to write")
                         response = (
                             supabase.table("ProjectLogs").insert(entry_dict).execute()
                         )
@@ -279,9 +274,7 @@ def run_structured_submit():
                         i = 1
                         while i<=10:
                             try:
-                                id_for_entry += 1
-                                entry_dict['id'] += 1
-                                print(f"Retrying with id {entry_dict['id']} - retry {i}")
+                                print(f"Retry {i}")
                                 response = (
                                     supabase.table("ProjectLogs").insert(entry_dict).execute()
                                 )
@@ -302,7 +295,8 @@ def run_structured_submit():
                                 print(f"Error occurred: {error_message}")
                                 i += 1
                                 sleep(0.5)
-                                message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
+                        else:
+                            message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
 
 
 with project_form_structured:
