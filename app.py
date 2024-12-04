@@ -1,8 +1,7 @@
 import streamlit as st
 from datetime import datetime, timezone
-from supabase import create_client, Client
+from supabase import create_client
 from streamlit_gsheets import GSheetsConnection
-import pandas as pd
 from time import sleep
 
 # Use wide layout
