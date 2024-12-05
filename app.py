@@ -5,7 +5,6 @@ from supabase import create_client
 from streamlit_gsheets import GSheetsConnection
 from time import sleep
 
-
 # Use wide layout
 st.set_page_config(layout="wide",
                    page_icon="hsma_icon.png",
@@ -107,7 +106,7 @@ get_projects_df()
 def refresh_status():
     get_projects_df()
 
-col_update_status_1, col_update_status_2 = st.columns(2)
+col_update_status_1, col_update_status_2 = st.columns([0.6,0.4])
 
 with col_update_status_1:
     if st.session_state.project_code is None:
@@ -116,10 +115,10 @@ with col_update_status_1:
         st.write(f"""This project last had an update recorded
                 on {st.session_state.project_updates.head(1)['display_date'].values[0]}
                 by {st.session_state.project_updates.head(1)['submitter'].values[0]}""")
-        st.write("*:grey[If you have just submitted a project update, this information will not be up to date!]*")
+        st.write("*:grey[If you have just submitted a project update, this information will not be up to date! Hit the refresh button.]*")
     else:
         st.write("No project updates have been provided for this project yet.")
-        st.write("*:grey[If you have just submitted a project update, this information will not be up to date!]*")
+        st.write("*:grey[If you have just submitted a project update, this information will not be up to date! Hit the refresh button.]*")
 
 if st.session_state.project_code is not None:
     with col_update_status_2:
@@ -344,7 +343,7 @@ def run_structured_submit():
                 {"entry_type": "Structured Log - Other Comments", "entry": st.session_state.other_comments_log},
             ]
 
-            for box in structured_log_dict:
+            for instance, box in enumerate(structured_log_dict):
                 entry_dict = {
                             "created_at": datetime.now(timezone.utc).isoformat(),
                             "project_code": int(st.session_state.project_code), # Ensure not passing as int64, which table will reject
@@ -361,15 +360,18 @@ def run_structured_submit():
                         )
                         if response.data:
                             print("Successfully written to ProjectLogs table on first try")
-                            st.session_state.message = {
-                                "type": "success",
-                                "text": f"""
-                                         Project Log Submitted Successfully!
-                                         \n\n**Project**: {st.session_state.project_code}
-                                         \n\n**Submitter**: {st.session_state.submitter_name}
-                                         \n\n**{box["entry_type"]}**: {box["entry"]}
-                                         """
-                                }
+                            if instance == 0:
+                                st.session_state.message = {
+                                    "type": "success",
+                                    "text": f"""
+                                            Project Log Submitted Successfully!
+                                            \n\n**Project**: {st.session_state.project_code}
+                                            \n\n**Submitter**: {st.session_state.submitter_name}
+                                            \n\n**{box["entry_type"]}**: {box["entry"]}
+                                            """
+                                    }
+                            else:
+                                st.session_state.message["text"] += f"""\n\n**{box["entry_type"]}**: {box["entry"]}"""
                             celebrate()
                         else:
                             raise Exception(response.error.message)
@@ -387,15 +389,18 @@ def run_structured_submit():
                                 )
                                 if response.data:
                                     print(f"Successfully written on retry {i}")
-                                    st.session_state.message = {
-                                "type": "success",
-                                "text": f"""
-                                         Project Log Submitted Successfully!
-                                         \n\n**Project**: {st.session_state.project_code}
-                                         \n\n**Submitter**: {st.session_state.submitter_name}
-                                         \n\n**{box["entry_type"]}**: {box["entry"]}
-                                         """
-                                }
+                                    if instance == 0:
+                                        st.session_state.message = {
+                                    "type": "success",
+                                    "text": f"""
+                                            Project Log Submitted Successfully!
+                                            \n\n**Project**: {st.session_state.project_code}
+                                            \n\n**Submitter**: {st.session_state.submitter_name}
+                                            \n\n**{box["entry_type"]}**: {box["entry"]}
+                                            """
+                                    }
+                                    else:
+                                        st.session_state.message["text"] += f"""\n\n**{box["entry_type"]}**: {box["entry"]}"""
                                     celebrate()
                                 else:
                                     raise Exception(response.error.message)
