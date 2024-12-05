@@ -263,12 +263,8 @@ def run_structured_submit():
     elif st.session_state.submitter_name == "":
         message = st.warning("Please enter your name before submitting")
         print("==Not submitted - name not entered==")
-    elif (st.session_state.key_progress_log == "" and
-          st.session_state.key_meetings_log == "" and
-          st.session_state.challenges_log == "" and
-          st.session_state.key_planned_activities_log == "" and
-          st.session_state.other_comments_log == ""):
-        message = st.warning("Please enter an update in at least one box before submitting")
+    elif (st.session_state.key_progress_log == ""):
+        message = st.warning("Please enter an update in at least the 'Project Progress' box before submitting")
         print("==Not submitted - no update entered==")
     else:
         with st.spinner("Submitting Log..."):
