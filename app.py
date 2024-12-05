@@ -89,10 +89,12 @@ elif len(st.session_state.project_updates) > 0:
     st.write(f"""This project last had an update recorded
             on {st.session_state.project_updates.head(1)['display_date'].values[0]}
             by {st.session_state.project_updates.head(1)['submitter'].values[0]}""")
+    st.write("*:grey[If you have just submitted a project update, this information will not be up to date!]*")
 else:
     st.write("No project updates have been provided for this project yet.")
+    st.write("*:grey[If you have just submitted a project update, this information will not be up to date!]*")
 
-st.write("*If you have just submitted a project update, this information will not be up to date!*")
+
 
 st.write("---")
 
