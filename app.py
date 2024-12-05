@@ -298,8 +298,55 @@ def project_form_simple_f():
                                         key="simple_update",
                                         height=400)
 
-        submit_simple_project_log = st.button("Submit Update", type='secondary', disabled=False,
-                                                on_click=run_simple_submit, icon=":material/send:")
+        def copy_simple_update_to_clipboard_as_md():
+
+            simple_log_md = f"""## Project: {st.session_state.project}
+
+Date: {datetime.now().strftime("%A, %B %d %Y at %H:%M")}
+
+Submitted by {st.session_state.submitter_name}
+
+### Project Progress
+
+{st.session_state.simple_update}
+
+            """
+
+            pyperclip.copy(simple_log_md)
+            st.toast("Copied Update To Your Clipboard", icon=":material/thumb_up:")
+
+        def copy_simple_update_to_clipboard_as_pt():
+
+            simple_log_md = f"""Project: {st.session_state.project}
+
+Date: {datetime.now().strftime("%A, %B %d %Y at %H:%M")}
+
+Submitted by {st.session_state.submitter_name}
+
+Project Progress: {st.session_state.simple_update}
+            """
+
+            pyperclip.copy(simple_log_md)
+            st.toast("Copied Update To Your Clipboard", icon=":material/thumb_up:")
+
+        submit_col_1a, submit_col_2a, submit_col_3a = st.columns(3)
+
+        submit_simple_project_log = submit_col_1a.button("Submit Update", type='primary', disabled=False,
+                                                on_click=run_simple_submit, icon=":material/send:",
+                                                use_container_width=True)
+
+        submit_col_2a.button("Copy Update to Clipboard as Markdown",
+                            on_click=copy_simple_update_to_clipboard_as_md,
+                            key="copy_simple_md",
+                            icon=":material/content_copy:",
+                            use_container_width=True)
+
+        submit_col_3a.button("Copy Update to Clipboard as Plain Text",
+                                    on_click=copy_simple_update_to_clipboard_as_pt,
+                                    icon=":material/content_copy:",
+                                    key="copy_simple_pt",
+                                    use_container_width=True)
+
 
         with st.empty():
             update_message()
