@@ -13,17 +13,21 @@ with open("style.css") as css:
     st.markdown(f'<style>{css.read()}</style>', unsafe_allow_html=True)
 
 # Create a Google Sheets Connection
-gs_conn = st.connection("gsheets", type=GSheetsConnection)
+@st.cache_resource
+def get_gs_connection():
+    return st.connection("gsheets", type=GSheetsConnection)
+
+gs_conn = get_gs_connection()
 
 # Function to initialise a Supabase DB connection from details stored in secrets
 @st.cache_resource
-def init_connection():
+def init_supabase_connection():
     url = st.secrets["SUPABASE_URL"]
     key = st.secrets["SUPABASE_KEY"]
     return create_client(url, key)
 
 # Create Supabase DB connection
-supabase = init_connection()
+supabase = init_supabase_connection()
 
 # Function to grab everything in the Supabase table
 def run_query_main():
