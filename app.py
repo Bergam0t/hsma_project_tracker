@@ -77,7 +77,7 @@ with header_col_r:
 
 with header_col_l:
     # Title for app
-    st.title("Welcome to the HSMA Project Progress Tracker")
+    st.title("The HSMA Project Progress Tracker")
 
 st.session_state.project = st.selectbox(
             """**What Project Does this Relate to?**
