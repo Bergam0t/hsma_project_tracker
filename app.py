@@ -280,7 +280,7 @@ def run_structured_submit():
                                                 Project Log Submitted Successfully!
                                                 \n\n**Project**: {st.session_state.project_code}
                                                 \n\n**Submitter**: {st.session_state.submitter_name}
-                                                \n\n**Log**: {box["entry"]}
+                                                \n\n**{box["entry_type"]}**: {box["entry"]}
                                                 """)
                             celebrate()
                         else:
@@ -303,7 +303,7 @@ def run_structured_submit():
                                                 Project Log Submitted Successfully!
                                                 \n\n**Project**: {st.session_state.project_code}
                                                 \n\n**Submitter**: {st.session_state.submitter_name}
-                                                \n\n**Log**: {box["entry"]}
+                                                \n\n**{box["entry_type"]}**: {box["entry"]}
                                                 """)
                                     celebrate()
                                 else:
