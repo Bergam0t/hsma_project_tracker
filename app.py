@@ -14,8 +14,12 @@ with open("style.css") as css:
 
 if 'existing_projects' not in st.session_state:
     st.session_state.existing_projects = pd.DataFrame()
-if 'existing_projects' not in st.session_state:
-    st.session_state.existing_projects = pd.DataFrame()
+if 'project_updates' not in st.session_state:
+    st.session_state.project_updates = None
+if 'project' not in st.session_state:
+    st.session_state.project = None
+
+st.session_state.message = {'type': "none", 'message': ''}
 
 # Create a Google Sheets Connection
 @st.cache_resource
@@ -54,10 +58,16 @@ def celebrate():
     else:
         st.balloons()
 
+def update_message():
+    print(st.session_state.message)
+    if st.session_state.message['type'] == 'success':
+        st.success(st.session_state.message["text"])
+    elif st.session_state.message['type'] == 'warning':
+        st.warning(st.session_state.message["text"])
+
 # st.dataframe(hsma_proj_reg_df)
 
 # Placeholder for success/error message
-message = ""
 
 header_col_l, header_col_r = st.columns([0.7, 0.3], vertical_alignment="center")
 
@@ -122,13 +132,22 @@ def run_simple_submit():
     print(f"Submitter: {st.session_state.submitter_name}")
     print(f"Update: {st.session_state.project_update}")
     if st.session_state.project_code is None:
-        message = st.warning("Please select a project before submitting")
+        st.session_state.message = {
+                "type": "warning",
+                "text": "Please select a project before submitting"
+                }
         print("==Not submitted - project not selected==")
     elif st.session_state.submitter_name == "":
-        message = st.warning("Please enter your name before submitting")
+        st.session_state.message = {
+                        "type": "warning",
+                        "text": "Please enter your name before submitting"
+                        }
         print("==Not submitted - name not entered==")
     elif st.session_state.project_update == "":
-        message = st.warning("Please enter your update before submitting")
+        st.session_state.message = {
+                        "type": "warning",
+                        "text": "Please enter your update before submitting"
+                        }
         print("==Not submitted - no update entered==")
     else:
         with st.spinner("Submitting Log..."):
@@ -148,12 +167,15 @@ def run_simple_submit():
                 )
                 if response.data:
                     print("Successfully written to ProjectLogs table on first try")
-                    message = st.success(f"""
+                    st.session_state.message = {
+                                "type": "success",
+                                "text": f"""
                                          Project Log Submitted Successfully!
                                          \n\n**Project**: {st.session_state.project_code}
                                          \n\n**Submitter**: {st.session_state.submitter_name}
                                          \n\n**Log**: {st.session_state.project_update}
-                                         """)
+                                         """
+                                }
                     celebrate()
                 else:
                     raise Exception(response.error.message)
@@ -171,12 +193,16 @@ def run_simple_submit():
                         )
                         if response.data:
                             print(f"Successfully written on retry {i}")
-                            message = st.success(f"""
+                            st.session_state.message = {
+                                "type": "success",
+                                "text": f"""
                                          Project Log Submitted Successfully!
                                          \n\n**Project**: {st.session_state.project_code}
                                          \n\n**Submitter**: {st.session_state.submitter_name}
                                          \n\n**Log**: {st.session_state.project_update}
-                                         """)
+                                         """
+                                }
+
                             celebrate()
                         else:
                             raise Exception(response.error.message)
@@ -187,7 +213,10 @@ def run_simple_submit():
                         i += 1
                         sleep(0.5)
                 else:
-                    message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
+                    st.session_state.message = {
+                        "type": "warning",
+                        "text": "Error Submitting Log - Please Contact Dan or Sammi on Slack"
+                        }
     sleep(2)
     get_projects_df()
 
@@ -245,7 +274,9 @@ def project_form_simple_f():
         submit_simple_project_log = st.button("Submit Update", type='primary', disabled=False,
                                                 on_click=run_simple_submit)
 
-        message
+        update_message()
+        get_projects_df()
+
 
 
 with project_form_simple:
@@ -258,13 +289,22 @@ def run_structured_submit():
     print(f"Submitter: {st.session_state.submitter_name}")
 
     if st.session_state.project_code is None:
-        message = st.warning("Please select a project before submitting")
+        st.session_state.message = {
+                "type": "warning",
+                "text": "Please select a project before submitting"
+                }
         print("==Not submitted - project not selected==")
     elif st.session_state.submitter_name == "":
-        message = st.warning("Please enter your name before submitting")
+        st.session_state.message = {
+                        "type": "warning",
+                        "text": "Please enter your name before submitting"
+                        }
         print("==Not submitted - name not entered==")
     elif (st.session_state.key_progress_log == ""):
-        message = st.warning("Please enter an update in at least the 'Project Progress' box before submitting")
+        st.session_state.message = {
+                        "type": "warning",
+                        "text": "Please enter an update in at least the 'Project Progress' box before submitting"
+                        }
         print("==Not submitted - no update entered==")
     else:
         with st.spinner("Submitting Log..."):
@@ -294,12 +334,15 @@ def run_structured_submit():
                         )
                         if response.data:
                             print("Successfully written to ProjectLogs table on first try")
-                            message = st.success(f"""
-                                                Project Log Submitted Successfully!
-                                                \n\n**Project**: {st.session_state.project_code}
-                                                \n\n**Submitter**: {st.session_state.submitter_name}
-                                                \n\n**{box["entry_type"]}**: {box["entry"]}
-                                                """)
+                            st.session_state.message = {
+                                "type": "success",
+                                "text": f"""
+                                         Project Log Submitted Successfully!
+                                         \n\n**Project**: {st.session_state.project_code}
+                                         \n\n**Submitter**: {st.session_state.submitter_name}
+                                         \n\n**{box["entry_type"]}**: {box["entry"]}
+                                         """
+                                }
                             celebrate()
                         else:
                             raise Exception(response.error.message)
@@ -317,12 +360,15 @@ def run_structured_submit():
                                 )
                                 if response.data:
                                     print(f"Successfully written on retry {i}")
-                                    message = st.success(f"""
-                                                Project Log Submitted Successfully!
-                                                \n\n**Project**: {st.session_state.project_code}
-                                                \n\n**Submitter**: {st.session_state.submitter_name}
-                                                \n\n**{box["entry_type"]}**: {box["entry"]}
-                                                """)
+                                    st.session_state.message = {
+                                "type": "success",
+                                "text": f"""
+                                         Project Log Submitted Successfully!
+                                         \n\n**Project**: {st.session_state.project_code}
+                                         \n\n**Submitter**: {st.session_state.submitter_name}
+                                         \n\n**{box["entry_type"]}**: {box["entry"]}
+                                         """
+                                }
                                     celebrate()
                                 else:
                                     raise Exception(response.error.message)
@@ -333,7 +379,10 @@ def run_structured_submit():
                                 i += 1
                                 sleep(0.5)
                         else:
-                            message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
+                            st.session_state.message = {
+                        "type": "warning",
+                        "text": "Error Submitting Log - Please Contact Dan or Sammi on Slack"
+                        }
     sleep(2)
     get_projects_df()
 
@@ -452,7 +501,9 @@ def project_form_structured_f():
                                               type='primary', disabled=False,
                                               on_click=run_structured_submit)
 
-    message
+
+    update_message()
+    get_projects_df()
 
 
 
