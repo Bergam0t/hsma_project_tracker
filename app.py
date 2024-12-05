@@ -301,8 +301,8 @@ def project_form_simple_f():
         submit_simple_project_log = st.button("Submit Update", type='secondary', disabled=False,
                                                 on_click=run_simple_submit)
 
-    with st.empty():
-        update_message()
+        with st.empty():
+            update_message()
 
 
 
