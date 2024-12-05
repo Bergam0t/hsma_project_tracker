@@ -348,7 +348,7 @@ Project Progress: {st.session_state.simple_update}
                                     use_container_width=True)
 
 
-        with st.empty():
+        with col_form_left.empty():
             update_message()
 
 
