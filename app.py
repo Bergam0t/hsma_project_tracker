@@ -142,7 +142,9 @@ st.session_state.submitter_name = st.text_input(
             "**What's your name?**\n\n*Please include your first name and surname*"
         )
 
-st.write("*Choose between 'Quick' for a simple one-box project log template, or 'Structured' if you'd like some more guidance on what to include in your project update*")
+st.write("""*Choose between 'Quick' for a simple one-box project log template, or 'Structured' if you'd like some more guidance on what to include in your project update*
+         \nYou only need to submit your log in one format - not both!
+         """)
 
 project_form_simple, project_form_structured = st.tabs(["Quick", "Structured"])
 
@@ -298,6 +300,11 @@ def run_structured_submit():
 
 @st.fragment
 def project_form_structured_f():
+
+    st.write("""Fill in as many of the boxes below as you would like, **then click the 'Submit' button at the bottom of the page**.
+             \n\nOnly the 'Project Progress' field is mandatory; any other fields can be filled in or left blank as you wish.""")
+
+    st.write("---")
 
     key_progress, bs1, key_meetings = st.columns([0.47,0.06,0.47])
 
