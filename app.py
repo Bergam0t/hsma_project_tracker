@@ -535,10 +535,6 @@ def project_form_structured_f():
         key="structured_other"
     )
 
-    submit_structured_project_log = st.button("Submit Update", key="submit_update_structured",
-                                              type='secondary', disabled=False,
-                                              on_click=run_structured_submit, icon=":material/send:")
-
     def copy_structured_update_to_clipboard_as_md():
 
         structured_log_md = f"""## Project: {st.session_state.project}
@@ -583,10 +579,51 @@ Submitted by {st.session_state.submitter_name}
         pyperclip.copy(structured_log_md)
         st.toast("Copied Update To Your Clipboard", icon=":material/thumb_up:")
 
+    def copy_structured_update_to_clipboard_as_pt():
 
-    copy_structured_log = st.button("Copy Update to Clipboard as Markdown",
+        structured_log_md = f"""Project: {st.session_state.project}
+
+Date: {datetime.now().strftime("%A, %B %d %Y at %H:%M")}
+
+Submitted by {st.session_state.submitter_name}
+        """
+
+        structured_log_md += f"\nProject Progress: {st.session_state.structured_progress}"
+
+        if st.session_state.structured_meetings:
+            structured_log_md += f"\n\nProject-related Meetings: {st.session_state.structured_meetings}"
+
+        if st.session_state.structured_challenges:
+            structured_log_md += f"\n\nChallenges: {st.session_state.structured_challenges}"
+
+        if st.session_state.structured_plans:
+            structured_log_md += f"\n\nNext Steps: {st.session_state.structured_plans}"
+
+        if st.session_state.structured_other:
+            structured_log_md += f"\n\nOther Comments: {st.session_state.structured_other}"
+
+        pyperclip.copy(structured_log_md)
+        st.toast("Copied Update To Your Clipboard", icon=":material/thumb_up:")
+
+    submit_col_1, submit_col_2, submit_col_3 = st.columns(3)
+
+    submit_structured_project_log = submit_col_1.button("Submit Update",
+                                                        key="submit_update_structured",
+                                                        type='primary',
+                                                        disabled=False,
+                                                        on_click=run_structured_submit,
+                                                        icon=":material/send:",
+                                                        use_container_width=True)
+
+    copy_structured_log = submit_col_2.button("Copy Update to Clipboard as Markdown",
                                     on_click=copy_structured_update_to_clipboard_as_md,
-                                    icon=":material/content_copy:")
+                                    icon=":material/content_copy:",
+                                    use_container_width=True)
+
+    copy_structured_log = submit_col_3.button("Copy Update to Clipboard as Plain Text",
+                                on_click=copy_structured_update_to_clipboard_as_pt,
+                                icon=":material/content_copy:",
+                                use_container_width=True)
 
     with st.empty():
         update_message()
