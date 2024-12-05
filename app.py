@@ -59,8 +59,14 @@ def celebrate():
 # Placeholder for success/error message
 message = ""
 
-# Title for app
-st.title("Welcome to the HSMA Project Progress Tracker")
+header_col_l, header_col_r = st.columns([0.7, 0.3], vertical_alignment="center")
+
+with header_col_r:
+    st.image("hsma_logo_wide_white.png", width=300)
+
+with header_col_l:
+    # Title for app
+    st.title("Welcome to the HSMA Project Progress Tracker")
 
 st.session_state.project = st.selectbox(
             """**What Project Does this Relate to?**
