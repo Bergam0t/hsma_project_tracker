@@ -4,6 +4,7 @@ import pandas as pd
 from supabase import create_client
 from streamlit_gsheets import GSheetsConnection
 from time import sleep
+import pyperclip
 
 # Use wide layout
 st.set_page_config(layout="wide",
@@ -298,7 +299,7 @@ def project_form_simple_f():
                                         height=400)
 
         submit_simple_project_log = st.button("Submit Update", type='secondary', disabled=False,
-                                                on_click=run_simple_submit)
+                                                on_click=run_simple_submit, icon=":material/send:")
 
         with st.empty():
             update_message()
@@ -512,7 +513,7 @@ def project_form_structured_f():
         key="structured_plans"
     )
 
-    other_comments.write("#### Any Other Comments")
+    other_comments.write("#### Other Comments")
 
     with other_comments.expander("Click here for an example entry"):
         st.info(
@@ -536,7 +537,56 @@ def project_form_structured_f():
 
     submit_structured_project_log = st.button("Submit Update", key="submit_update_structured",
                                               type='secondary', disabled=False,
-                                              on_click=run_structured_submit)
+                                              on_click=run_structured_submit, icon=":material/send:")
+
+    def copy_structured_update_to_clipboard_as_md():
+
+        structured_log_md = f"""## Project: {st.session_state.project}
+
+Date: {datetime.now().strftime("%A, %B %d %Y at %H:%M")}
+
+Submitted by {st.session_state.submitter_name}
+
+### Project Progress
+
+{st.session_state.structured_progress}
+
+        """
+
+        if st.session_state.structured_meetings:
+            structured_log_md += f"""
+### Project-related Meetings
+
+{st.session_state.structured_meetings}
+            """
+
+        if st.session_state.structured_challenges:
+            structured_log_md += f"""
+### Challenges
+
+{st.session_state.structured_challenges}
+            """
+        if st.session_state.structured_plans:
+            structured_log_md += f"""
+### Next Steps
+
+{st.session_state.structured_plans}
+            """
+
+        if st.session_state.structured_other:
+            structured_log_md += f"""
+### Other Comments
+
+{st.session_state.structured_other}
+            """
+
+        pyperclip.copy(structured_log_md)
+        st.toast("Copied Update To Your Clipboard", icon=":material/thumb_up:")
+
+
+    copy_structured_log = st.button("Copy Update to Clipboard as Markdown",
+                                    on_click=copy_structured_update_to_clipboard_as_md,
+                                    icon=":material/content_copy:")
 
     with st.empty():
         update_message()
