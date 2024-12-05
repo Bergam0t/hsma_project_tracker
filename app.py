@@ -10,9 +10,11 @@ st.set_page_config(layout="wide",
                    page_icon="hsma_icon.png",
                    page_title="HSMA Project Progress Reporter")
 
+# Import stylesheet for font and page margin setting
 with open("style.css") as css:
     st.markdown(f'<style>{css.read()}</style>', unsafe_allow_html=True)
 
+# Initialise session state variables
 if 'existing_projects' not in st.session_state:
     st.session_state.existing_projects = pd.DataFrame()
 if 'project_updates' not in st.session_state:
@@ -39,17 +41,21 @@ def init_supabase_connection():
 # Create Supabase DB connection
 supabase = init_supabase_connection()
 
-# Function to grab everything in the Supabase table
+# Function to grab everything from the HSMA project register spreadsheet
+@st.cache_data(ttl=60)
+def get_proj_register_df():
+    hsma_proj_reg_df = gs_conn.read()
+    hsma_proj_reg_df = hsma_proj_reg_df.sort_values("Project Code")
+    hsma_proj_reg_df["Full Project Title"] = hsma_proj_reg_df["Project Code"].astype('str') + ": " + hsma_proj_reg_df["Project Title"]
+    hsma_proj_reg_df["Full Project Title and Leads"] = hsma_proj_reg_df["Full Project Title"] + " (" + hsma_proj_reg_df["Lead"] + ")"
+    return hsma_proj_reg_df
+
+# Function to grab everything in the Supabase table of project logs
 def run_query_main():
     return supabase.table("ProjectLogs").select("*").execute()
 
-hsma_proj_reg_df = gs_conn.read(ttl=60)
-
-hsma_proj_reg_df = hsma_proj_reg_df.sort_values("Project Code")
-
-hsma_proj_reg_df["Full Project Title"] = hsma_proj_reg_df["Project Code"].astype('str') + ": " + hsma_proj_reg_df["Project Title"]
-hsma_proj_reg_df["Full Project Title and Leads"] = hsma_proj_reg_df["Full Project Title"] + " (" + hsma_proj_reg_df["Lead"] + ")"
-
+# Set up entries for project list dropdown
+hsma_proj_reg_df = get_proj_register_df()
 project_list = ["Please Select a Project"]
 project_list =  project_list + hsma_proj_reg_df['Full Project Title and Leads'].tolist()
 
@@ -66,10 +72,7 @@ def update_message():
     elif st.session_state.message['type'] == 'warning':
         st.warning(st.session_state.message["text"])
 
-# st.dataframe(hsma_proj_reg_df)
-
-# Placeholder for success/error message
-
+# Set up header with title and logo
 header_col_l, header_col_r = st.columns([0.7, 0.3], vertical_alignment="center")
 
 with header_col_r:
@@ -79,6 +82,7 @@ with header_col_l:
     # Title for app
     st.title("The HSMA Project Progress Tracker")
 
+# Set up entry for project code
 st.session_state.project = st.selectbox(
             """**What Project Does this Relate to?**
             \n\nStart typing a project code, title or team member to filter the project list, or scroll down to find your project.
@@ -100,17 +104,26 @@ def get_projects_df():
 
 get_projects_df()
 
-if st.session_state.project_code is None:
-    st.write("") # Blank line so layout doesn't change after project section
-elif len(st.session_state.project_updates) > 0:
-    st.write(f"""This project last had an update recorded
-            on {st.session_state.project_updates.head(1)['display_date'].values[0]}
-            by {st.session_state.project_updates.head(1)['submitter'].values[0]}""")
-    st.write("*:grey[If you have just submitted a project update, this information will not be up to date!]*")
-else:
-    st.write("No project updates have been provided for this project yet.")
-    st.write("*:grey[If you have just submitted a project update, this information will not be up to date!]*")
+def refresh_status():
+    get_projects_df()
 
+col_update_status_1, col_update_status_2 = st.columns(2)
+
+with col_update_status_1:
+    if st.session_state.project_code is None:
+        st.write("") # Blank line to try and avoid layout changing after project section
+    elif len(st.session_state.project_updates) > 0:
+        st.write(f"""This project last had an update recorded
+                on {st.session_state.project_updates.head(1)['display_date'].values[0]}
+                by {st.session_state.project_updates.head(1)['submitter'].values[0]}""")
+        st.write("*:grey[If you have just submitted a project update, this information will not be up to date!]*")
+    else:
+        st.write("No project updates have been provided for this project yet.")
+        st.write("*:grey[If you have just submitted a project update, this information will not be up to date!]*")
+
+if st.session_state.project_code is not None:
+    with col_update_status_2:
+        st.button("Refresh last updated date", icon=":material/autorenew:", on_click=refresh_status())
 
 
 st.write("---")
@@ -218,7 +231,7 @@ def run_simple_submit():
                         "type": "warning",
                         "text": "Error Submitting Log - Please Contact Dan or Sammi on Slack"
                         }
-    sleep(2)
+    sleep(4)
     get_projects_df()
 
 @st.fragment
@@ -275,8 +288,8 @@ def project_form_simple_f():
         submit_simple_project_log = st.button("Submit Update", type='primary', disabled=False,
                                                 on_click=run_simple_submit)
 
-        update_message()
-        get_projects_df()
+    update_message()
+    get_projects_df()
 
 
 
@@ -384,7 +397,8 @@ def run_structured_submit():
                         "type": "warning",
                         "text": "Error Submitting Log - Please Contact Dan or Sammi on Slack"
                         }
-    sleep(2)
+
+    update_message()
     get_projects_df()
 
 
@@ -504,9 +518,6 @@ def project_form_structured_f():
 
 
     update_message()
-    get_projects_df()
-
-
 
 with project_form_structured:
     project_form_structured_f()
