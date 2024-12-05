@@ -302,6 +302,15 @@ def project_form_structured_f():
     key_progress, bs1, key_meetings = st.columns([0.47,0.06,0.47])
 
     key_progress.write("#### Project Progress")
+    with key_progress.expander("Click here for an example entry"):
+        st.info(
+        """
+        - Main area of focus was continuing with exploratory data analysis and data quality assessment of available data.
+        - Continued to develop understanding of urgent care system:
+        - Visually explored care pathways and diagnostic history of frequent users of and packaged into reusable interactive HTML format that could be distributed (however, further polish would be required, plus IG considerations). This is effectively an R/Plotly implementation of the Theograph concept that could be further developed.
+        - Additional reading of emergency department modelling literature; storing this in Zotero for reference during writeup.
+        """
+        )
 
     st.session_state.key_progress_log = key_progress.text_area(
         """**MANDATORY FIELD**
@@ -310,6 +319,13 @@ def project_form_structured_f():
     )
 
     key_meetings.write("#### Project-related Meetings")
+    with key_meetings.expander("Click here for an example entry"):
+        st.info(
+        """
+        - Afternoon in-person with head of operations to discuss work so far and explore additional areas of interest
+        - Chat with Bob Bobson (HSMA 5 alumni) about experience working on a similar project last year - identified areas of potential code reuse
+        """
+        )
     st.session_state.key_meetings_log = key_meetings.text_area(
         """*OPTIONAL FIELD*
         \n\nProvide a brief overview of any meetings you have had with stakeholders or other parties since your last update
@@ -317,11 +333,21 @@ def project_form_structured_f():
         height=250
     )
 
+    st.write("---")
+
     st.subheader("Challenges and Next Steps")
 
     challenges, bs3, key_planned_activities, bs4, other_comments = st.columns([0.3,0.05,0.3,0.05,0.3])
 
     challenges.write("#### Challenges")
+    with challenges.expander("Click here for an example entry"):
+        st.info(
+        """
+        - Continued difficulty with access to relevant ICB dashboards due to licencing.
+        - Large volume of ad-hoc requests have limited additional time available for project work
+        - Short month due to bank holidays and one member of team on annual leave for 2 weeks
+        """
+        )
     st.session_state.challenges_log = challenges.text_area(
         """*OPTIONAL FIELD*
         \n\nWhat challenges have you faced in your project since your last update?
@@ -332,6 +358,19 @@ def project_form_structured_f():
     )
 
     key_planned_activities.write("#### Next Steps")
+    with key_planned_activities.expander("Click here for an example entry"):
+        st.info(
+        """
+        Activities:
+        - Get all steps required to fully automate data flows complete.
+        - Various tidying up and handover work.
+        - Action any key feedback from stakeholders.
+
+        Key meetings
+        - Meeting with operational lead on 6th April to discuss training and implementation plans, plus post-implementation review and next steps
+        - Presenting work in emergency care board meeting on 7th April
+        """
+        )
     st.session_state.key_planned_activities_log = key_planned_activities.text_area(
         """*OPTIONAL FIELD*
         \n\nWhat are you planning to do in the next month?
@@ -342,6 +381,18 @@ def project_form_structured_f():
     )
 
     other_comments.write("#### Any Other Comments")
+
+    with other_comments.expander("Click here for an example entry"):
+        st.info(
+        """
+        A request for a dashboard to support bed delivery meetings came in – a colleague was able to adapt my work to quickly provide all of the data required for these meetings.
+        Feedback from this group has been positive.
+
+        Two follow-up meetings regarding wider implementation and potential for dissemination of learning came out of the presentation to our expert panel, and the following feedback was received
+        from an ICB colleague present at this presentation: "The project team have just blown everyone’s minds with how they have engaged with operational end-users in a complex area and developed a model that are what everyone didn’t know they needed and didn’t think was possible.
+        Really helped showcase the potential of data and the need to invest in the capacity and capability of data science.”
+        """
+        )
 
     st.session_state.other_comments_log = other_comments.text_area(
     """*OPTIONAL FIELD*
