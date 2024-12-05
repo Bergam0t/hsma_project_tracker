@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import datetime, timezone
+import pandas as pd
 from supabase import create_client
 from streamlit_gsheets import GSheetsConnection
 from time import sleep
@@ -137,6 +138,21 @@ if st.session_state.project != "Please Select a Project":
     st.session_state.project_code = hsma_proj_reg_df[hsma_proj_reg_df['Full Project Title and Leads'] == st.session_state.project]['Project Code'].values[0]
 else:
     st.session_state.project_code = None
+
+existing_projects = pd.DataFrame(run_query_main().data)
+existing_projects = existing_projects[["created_at", "project_code", "submitter"]]
+existing_projects["display_date"] = pd.to_datetime(existing_projects["created_at"]).dt.strftime("%A, %B %d %Y at %H:%M")
+
+project_updates = existing_projects[existing_projects["project_code"] == st.session_state.project_code].sort_values("display_date")
+if st.session_state.project_code is None:
+    st.write("") # Blank line so layout doesn't change after project section
+elif len(project_updates) > 0:
+    st.write(f"""This project last had an update recorded
+             on {project_updates.head(1)['display_date'].values[0]}
+             by {project_updates.head(1)['submitter'].values[0]}""")
+else:
+    st.write("No project updates have been provided for this project yet.")
+
 
 st.session_state.submitter_name = st.text_input(
             "**What's your name?**\n\n*Please include your first name and surname*"
@@ -313,7 +329,7 @@ def project_form_structured_f():
         st.info(
         """
         - Main area of focus was continuing with exploratory data analysis and data quality assessment of available data.
-        - Continued to develop understanding of urgent care system:
+        - Continued to develop understanding of urgent care system.
         - Visually explored care pathways and diagnostic history of frequent users of and packaged into reusable interactive HTML format that could be distributed (however, further polish would be required, plus IG considerations). This is effectively an R/Plotly implementation of the Theograph concept that could be further developed.
         - Additional reading of emergency department modelling literature; storing this in Zotero for reference during writeup.
         """
@@ -353,6 +369,7 @@ def project_form_structured_f():
         - Continued difficulty with access to relevant ICB dashboards due to licencing.
         - Large volume of ad-hoc requests have limited additional time available for project work
         - Short month due to bank holidays and one member of team on annual leave for 2 weeks
+        - We're getting good engagement in general, but there's been some misunderstandings about the simplifications in the model that needs to be addressed
         """
         )
     st.session_state.challenges_log = challenges.text_area(
@@ -370,8 +387,7 @@ def project_form_structured_f():
         """
         Activities:
         - Get all steps required to fully automate data flows complete.
-        - Various tidying up and handover work.
-        - Action any key feedback from stakeholders.
+        - Add in additional sliders to model to allow for manual tweaking of demand forecasts.
 
         Key meetings
         - Meeting with operational lead on 6th April to discuss training and implementation plans, plus post-implementation review and next steps
