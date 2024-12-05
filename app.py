@@ -135,9 +135,24 @@ st.session_state.submitter_name = st.text_input(
 st.write("---")
 st.subheader("Submit your Progress Report")
 
-st.write("""*Choose between 'Quick' for a simple one-box project log template, or 'Structured' if you'd like some more guidance on what to include in your project update*
+col_a, col_b, col_c = st.columns([0.6,0.2,0.2])
+
+col_a.write("""*Choose between 'Quick' for a simple one-box project log template, or 'Structured' if you'd like some more guidance on what to include in your project update*
          \nYou only need to submit your log in one format - not both!
          """)
+
+def clear_textboxes():
+    st.session_state.simple_update = ""
+    st.session_state.structured_progress = ""
+    st.session_state.structured_meetings = ""
+    st.session_state.structured_challenges = ""
+    st.session_state.structured_plans = ""
+    st.session_state.structured_other = ""
+
+col_c.button("Clear All Text Boxes", icon=":material/delete:" ,
+            on_click=clear_textboxes,
+            type="primary")
+
 
 project_form_simple, project_form_structured = st.tabs(["Quick", "Structured"])
 
@@ -274,18 +289,15 @@ def project_form_simple_f():
                         )
 
     with col_form_left:
-        # pass
-        # update_date = st.date_input(
-        #     "Please Enter the Date of the Update"
-        # )
 
         st.session_state.project_update = st.text_area("""**What is your update?**
                                         \n\nThis can be a couple of sentences or a couple of paragraphs - whatever is useful to you!
                                         \n\nWe'd recommend you keep your own copy of this update for your records.
                                         """,
+                                        key="simple_update",
                                         height=400)
 
-        submit_simple_project_log = st.button("Submit Update", type='primary', disabled=False,
+        submit_simple_project_log = st.button("Submit Update", type='secondary', disabled=False,
                                                 on_click=run_simple_submit)
 
     update_message()
@@ -426,7 +438,8 @@ def project_form_structured_f():
     st.session_state.key_progress_log = key_progress.text_area(
         """**MANDATORY FIELD**
         \n\nPlease enter what progress you have made with your project since your last update""",
-        height=250
+        height=250,
+        key="structured_progress"
     )
 
     key_meetings.write("#### Project-related Meetings")
@@ -441,7 +454,8 @@ def project_form_structured_f():
         """*OPTIONAL FIELD*
         \n\nProvide a brief overview of any meetings you have had with stakeholders or other parties since your last update
         """,
-        height=250
+        height=250,
+        key="structured_meetings"
     )
 
     st.write("---")
@@ -466,7 +480,8 @@ def project_form_structured_f():
         \n\n• Do you have any updates on previous challenges you have faced?
         \n\n:red[If you have any blockers that you need the HSMA team's input on, please contact us on Slack.]
         """,
-        height=250
+        height=250,
+        key="structured_challenges"
     )
 
     key_planned_activities.write("#### Next Steps")
@@ -488,7 +503,8 @@ def project_form_structured_f():
         \n\n• What are your key next steps?
         \n\n• Are there any meetings in the diary or that you are planning to arrange?
         """,
-        height=250
+        height=250,
+        key="structured_plans"
     )
 
     other_comments.write("#### Any Other Comments")
@@ -509,11 +525,12 @@ def project_form_structured_f():
     """*OPTIONAL FIELD*
     \n\nUse this space for any other comments that don't fit under any of the other headers
     """,
-        height=250
+        height=250,
+        key="structured_other"
     )
 
     submit_structured_project_log = st.button("Submit Update", key="submit_update_structured",
-                                              type='primary', disabled=False,
+                                              type='secondary', disabled=False,
                                               on_click=run_structured_submit)
 
 
