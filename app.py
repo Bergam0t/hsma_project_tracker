@@ -85,7 +85,7 @@ def get_projects_df():
     st.session_state.existing_projects = pd.DataFrame(run_query_main().data)
     st.session_state.existing_projects = st.session_state.existing_projects[["created_at", "project_code", "submitter"]]
     st.session_state.existing_projects["display_date"] = pd.to_datetime(st.session_state.existing_projects["created_at"]).dt.strftime("%A, %B %d %Y at %H:%M")
-    st.session_state.project_updates = st.session_state.existing_projects[st.session_state.existing_projects["project_code"] == st.session_state.project_code].sort_values("display_date")
+    st.session_state.project_updates = st.session_state.existing_projects[st.session_state.existing_projects["project_code"] == st.session_state.project_code].sort_values("display_date", ascending=False)
 
 get_projects_df()
 
