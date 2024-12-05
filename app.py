@@ -151,6 +151,8 @@ def clear_textboxes():
 
 col_c.button("Clear All Text Boxes", icon=":material/delete:" ,
             on_click=clear_textboxes,
+            help="""If you are submitting logs for multiple projects,
+            use this button to clear the fields between projects""",
             type="primary")
 
 
