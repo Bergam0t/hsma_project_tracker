@@ -12,6 +12,11 @@ st.set_page_config(layout="wide",
 with open("style.css") as css:
     st.markdown(f'<style>{css.read()}</style>', unsafe_allow_html=True)
 
+if 'existing_projects' not in st.session_state:
+    st.session_state.existing_projects = pd.DataFrame()
+if 'existing_projects' not in st.session_state:
+    st.session_state.existing_projects = pd.DataFrame()
+
 # Create a Google Sheets Connection
 @st.cache_resource
 def get_gs_connection():
@@ -43,18 +48,66 @@ hsma_proj_reg_df["Full Project Title and Leads"] = hsma_proj_reg_df["Full Projec
 project_list = ["Please Select a Project"]
 project_list =  project_list + hsma_proj_reg_df['Full Project Title and Leads'].tolist()
 
-# st.dataframe(hsma_proj_reg_df)
-
-message = ""
-
-# Title for app
-st.title("Welcome to the HSMA Project Progress Tracker")
-
 def celebrate():
     if datetime.now().month == 12:
         st.snow()
     else:
         st.balloons()
+
+# st.dataframe(hsma_proj_reg_df)
+
+# Placeholder for success/error message
+message = ""
+
+# Title for app
+st.title("Welcome to the HSMA Project Progress Tracker")
+
+st.session_state.project = st.selectbox(
+            """**What Project Does this Relate to?**
+            \n\nStart typing a project code, title or team member to filter the project list, or scroll down to find your project.
+            """,
+            project_list,
+            help="Note that only projects that have been registered via the 'new project airlock' channel on Slack will appear in this list."
+        )
+
+if st.session_state.project != "Please Select a Project":
+    st.session_state.project_code = hsma_proj_reg_df[hsma_proj_reg_df['Full Project Title and Leads'] == st.session_state.project]['Project Code'].values[0]
+else:
+    st.session_state.project_code = None
+
+def get_projects_df():
+    st.session_state.existing_projects = pd.DataFrame(run_query_main().data)
+    st.session_state.existing_projects = st.session_state.existing_projects[["created_at", "project_code", "submitter"]]
+    st.session_state.existing_projects["display_date"] = pd.to_datetime(st.session_state.existing_projects["created_at"]).dt.strftime("%A, %B %d %Y at %H:%M")
+    st.session_state.project_updates = st.session_state.existing_projects[st.session_state.existing_projects["project_code"] == st.session_state.project_code].sort_values("display_date")
+
+get_projects_df()
+
+if st.session_state.project_code is None:
+    st.write("") # Blank line so layout doesn't change after project section
+elif len(st.session_state.project_updates) > 0:
+    st.write(f"""This project last had an update recorded
+            on {st.session_state.project_updates.head(1)['display_date'].values[0]}
+            by {st.session_state.project_updates.head(1)['submitter'].values[0]}""")
+else:
+    st.write("No project updates have been provided for this project yet.")
+
+st.write("*If you have just submitted a project update, this information will not be up to date!*")
+
+st.write("---")
+
+st.session_state.submitter_name = st.text_input(
+            "**What's your name?**\n\n*Please include your first name and surname*"
+        )
+
+st.write("---")
+st.subheader("Submit your Progress Report")
+
+st.write("""*Choose between 'Quick' for a simple one-box project log template, or 'Structured' if you'd like some more guidance on what to include in your project update*
+         \nYou only need to submit your log in one format - not both!
+         """)
+
+project_form_simple, project_form_structured = st.tabs(["Quick", "Structured"])
 
 def run_simple_submit():
     print(f"Project Code: {st.session_state.project_code}")
@@ -70,8 +123,6 @@ def run_simple_submit():
         message = st.warning("Please enter your update before submitting")
         print("==Not submitted - no update entered==")
     else:
-        rows = run_query_main()
-
         with st.spinner("Submitting Log..."):
 
             entry_dict = {
@@ -129,44 +180,8 @@ def run_simple_submit():
                         sleep(0.5)
                 else:
                     message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
-
-st.session_state.project = st.selectbox(
-            """**What Project Does this Relate to?**
-            \n\nStart typing a project code, title or team member to filter the project list, or scroll down to find your project.
-            """,
-            project_list,
-            help="Note that only projects that have been registered via the 'new project airlock' channel on Slack will appear in this list."
-        )
-
-if st.session_state.project != "Please Select a Project":
-    st.session_state.project_code = hsma_proj_reg_df[hsma_proj_reg_df['Full Project Title and Leads'] == st.session_state.project]['Project Code'].values[0]
-else:
-    st.session_state.project_code = None
-
-existing_projects = pd.DataFrame(run_query_main().data)
-existing_projects = existing_projects[["created_at", "project_code", "submitter"]]
-existing_projects["display_date"] = pd.to_datetime(existing_projects["created_at"]).dt.strftime("%A, %B %d %Y at %H:%M")
-
-project_updates = existing_projects[existing_projects["project_code"] == st.session_state.project_code].sort_values("display_date")
-if st.session_state.project_code is None:
-    st.write("") # Blank line so layout doesn't change after project section
-elif len(project_updates) > 0:
-    st.write(f"""This project last had an update recorded
-             on {project_updates.head(1)['display_date'].values[0]}
-             by {project_updates.head(1)['submitter'].values[0]}""")
-else:
-    st.write("No project updates have been provided for this project yet.")
-
-
-st.session_state.submitter_name = st.text_input(
-            "**What's your name?**\n\n*Please include your first name and surname*"
-        )
-
-st.write("""*Choose between 'Quick' for a simple one-box project log template, or 'Structured' if you'd like some more guidance on what to include in your project update*
-         \nYou only need to submit your log in one format - not both!
-         """)
-
-project_form_simple, project_form_structured = st.tabs(["Quick", "Structured"])
+    sleep(2)
+    get_projects_df()
 
 @st.fragment
 def project_form_simple_f():
@@ -224,6 +239,7 @@ def project_form_simple_f():
 
         message
 
+
 with project_form_simple:
     project_form_simple_f()
 
@@ -247,8 +263,6 @@ def run_structured_submit():
         message = st.warning("Please enter an update in at least one box before submitting")
         print("==Not submitted - no update entered==")
     else:
-        rows = run_query_main()
-
         with st.spinner("Submitting Log..."):
 
             structured_log_dict = [
@@ -316,6 +330,8 @@ def run_structured_submit():
                                 sleep(0.5)
                         else:
                             message = st.warning("Error Submitting Log - Please Contact Dan or Sammi on Slack")
+    sleep(2)
+    get_projects_df()
 
 
 @st.fragment
@@ -433,6 +449,7 @@ def project_form_structured_f():
                                               on_click=run_structured_submit)
 
     message
+
 
 
 with project_form_structured:
