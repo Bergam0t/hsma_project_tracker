@@ -398,9 +398,9 @@ def project_form_structured_f():
         )
     st.session_state.challenges_log = challenges.text_area(
         """*OPTIONAL FIELD*
-        \n\nWhat challenges have you faced in your project since your last update?
-        \n\nDo you have any updates on previous challenges you have faced?
-        \n\nIf you have any blockers that you need the HSMA team's input on, please contact us on Slack.
+        \n\n• What challenges have you faced in your project since your last update?
+        \n\n• Do you have any updates on previous challenges you have faced?
+        \n\n:red[If you have any blockers that you need the HSMA team's input on, please contact us on Slack.]
         """,
         height=250
     )
@@ -420,9 +420,9 @@ def project_form_structured_f():
         )
     st.session_state.key_planned_activities_log = key_planned_activities.text_area(
         """*OPTIONAL FIELD*
-        \n\nWhat are you planning to do in the next month?
-        \n\nWhat are your key next steps?
-        \n\nAre there any meetings in the diary or that you are planning to arrange?
+        \n\n• What are you planning to do in the next month?
+        \n\n• What are your key next steps?
+        \n\n• Are there any meetings in the diary or that you are planning to arrange?
         """,
         height=250
     )
