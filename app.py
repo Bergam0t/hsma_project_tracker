@@ -219,7 +219,6 @@ def run_structured_submit():
         print("==Not submitted - name not entered==")
     elif (st.session_state.key_progress_log == "" and
           st.session_state.key_meetings_log == "" and
-          st.session_state.additional_notes_log == "" and
           st.session_state.challenges_log == "" and
           st.session_state.key_planned_activities_log == "" and
           st.session_state.other_comments_log == ""):
@@ -233,7 +232,6 @@ def run_structured_submit():
             structured_log_dict = [
                 {"entry_type": "Structured Log - Progress", "entry": st.session_state.key_progress_log},
                 {"entry_type": "Structured Log - Meetings", "entry": st.session_state.key_meetings_log},
-                {"entry_type": "Structured Log - Additional Progress Notes", "entry": st.session_state.additional_notes_log},
                 {"entry_type": "Structured Log - Challenges", "entry": st.session_state.challenges_log},
                 {"entry_type": "Structured Log - Planned Activities", "entry": st.session_state.key_planned_activities_log},
                 {"entry_type": "Structured Log - Other Comments", "entry": st.session_state.other_comments_log},
@@ -301,24 +299,21 @@ def run_structured_submit():
 @st.fragment
 def project_form_structured_f():
 
-    key_progress, bs1, key_meetings, bs2, additional_notes = st.columns([0.3,0.05,0.3,0.05,0.3])
+    key_progress, bs1, key_meetings = st.columns([0.47,0.06,0.47])
 
     key_progress.write("#### Project Progress")
 
     st.session_state.key_progress_log = key_progress.text_area(
-        "Please enter what progress you have made with your project since your last update",
+        """**MANDATORY FIELD**
+        \n\nPlease enter what progress you have made with your project since your last update""",
         height=250
     )
 
     key_meetings.write("#### Project-related Meetings")
     st.session_state.key_meetings_log = key_meetings.text_area(
-        "Provide a brief overview of any meetings you have had with stakeholders or other parties since your last update",
-        height=250
-    )
-
-    additional_notes.write("#### Additional Notes on Progress")
-    st.session_state.additional_notes_log = additional_notes.text_area(
-        "Use this space for any additional notes about your project progress so far that don't fit into the previous categories",
+        """*OPTIONAL FIELD*
+        \n\nProvide a brief overview of any meetings you have had with stakeholders or other parties since your last update
+        """,
         height=250
     )
 
@@ -328,7 +323,8 @@ def project_form_structured_f():
 
     challenges.write("#### Challenges")
     st.session_state.challenges_log = challenges.text_area(
-        """What challenges have you faced in your project since your last update?
+        """*OPTIONAL FIELD*
+        \n\nWhat challenges have you faced in your project since your last update?
         \n\nDo you have any updates on previous challenges you have faced?
         \n\nIf you have any blockers that you need the HSMA team's input on, please contact us on Slack.
         """,
@@ -337,8 +333,10 @@ def project_form_structured_f():
 
     key_planned_activities.write("#### Next Steps")
     st.session_state.key_planned_activities_log = key_planned_activities.text_area(
-        """What are you planning to do in the next month?
+        """*OPTIONAL FIELD*
+        \n\nWhat are you planning to do in the next month?
         \n\nWhat are your key next steps?
+        \n\nAre there any meetings in the diary or that you are planning to arrange?
         """,
         height=250
     )
@@ -346,7 +344,8 @@ def project_form_structured_f():
     other_comments.write("#### Any Other Comments")
 
     st.session_state.other_comments_log = other_comments.text_area(
-    """Use this space for any other comments that don't fit under any of the other headers
+    """*OPTIONAL FIELD*
+    \n\nUse this space for any other comments that don't fit under any of the other headers
     """,
         height=250
     )
