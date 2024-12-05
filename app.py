@@ -7,6 +7,7 @@ from time import sleep
 
 # Use wide layout
 st.set_page_config(layout="wide",
+                   page_icon="hsma_icon.png",
                    page_title="HSMA Project Progress Reporter")
 
 with open("style.css") as css:
