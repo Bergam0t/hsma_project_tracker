@@ -5,6 +5,7 @@ from supabase import create_client
 from streamlit_gsheets import GSheetsConnection
 from time import sleep
 
+
 # Use wide layout
 st.set_page_config(layout="wide",
                    page_icon="hsma_icon.png",
@@ -66,7 +67,6 @@ def celebrate():
         st.balloons()
 
 def update_message():
-    print(st.session_state.message)
     if st.session_state.message['type'] == 'success':
         st.success(st.session_state.message["text"])
     elif st.session_state.message['type'] == 'warning':
@@ -154,7 +154,6 @@ col_c.button("Clear All Text Boxes", icon=":material/delete:" ,
             help="""If you are submitting logs for multiple projects,
             use this button to clear the fields between projects""",
             type="primary")
-
 
 project_form_simple, project_form_structured = st.tabs(["Quick", "Structured"])
 
@@ -248,8 +247,8 @@ def run_simple_submit():
                         "type": "warning",
                         "text": "Error Submitting Log - Please Contact Dan or Sammi on Slack"
                         }
-    sleep(4)
     get_projects_df()
+
 
 @st.fragment
 def project_form_simple_f():
@@ -302,8 +301,8 @@ def project_form_simple_f():
         submit_simple_project_log = st.button("Submit Update", type='secondary', disabled=False,
                                                 on_click=run_simple_submit)
 
-    update_message()
-    get_projects_df()
+    with st.empty():
+        update_message()
 
 
 
@@ -412,7 +411,6 @@ def run_structured_submit():
                         "text": "Error Submitting Log - Please Contact Dan or Sammi on Slack"
                         }
 
-    update_message()
     get_projects_df()
 
 
@@ -535,8 +533,8 @@ def project_form_structured_f():
                                               type='secondary', disabled=False,
                                               on_click=run_structured_submit)
 
-
-    update_message()
+    with st.empty():
+        update_message()
 
 with project_form_structured:
     project_form_structured_f()
