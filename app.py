@@ -652,6 +652,8 @@ Submitted by {st.session_state.submitter_name}
         pyperclip.copy(structured_log_md)
         st.toast("Copied Update To Your Clipboard", icon=":material/thumb_up:")
 
+    st.write("---")
+
     submit_col_1, submit_col_2, submit_col_3 = st.columns(3)
 
     submit_structured_project_log = submit_col_1.button("Submit Update",
