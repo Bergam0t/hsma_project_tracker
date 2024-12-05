@@ -5,6 +5,7 @@ from supabase import create_client
 from streamlit_gsheets import GSheetsConnection
 from time import sleep
 import pyperclip
+from streamlit_extras.stylable_container import stylable_container
 
 # Use wide layout
 st.set_page_config(layout="wide",
@@ -331,9 +332,19 @@ Project Progress: {st.session_state.simple_update}
 
         submit_col_1a, submit_col_2a, submit_col_3a = st.columns(3)
 
-        submit_simple_project_log = submit_col_1a.button("Submit Update", type='primary', disabled=False,
-                                                on_click=run_simple_submit, icon=":material/send:",
-                                                use_container_width=True)
+    with submit_col_1a:
+        with stylable_container(
+            "green",
+            css_styles="""
+            button {
+                background-color: #0A524E;
+                color: white;
+                border: 2px solid white;
+            }"""):
+
+            submit_simple_project_log = st.button("Submit Update", type='primary', disabled=False,
+                                                    on_click=run_simple_submit, icon=":material/send:",
+                                                    use_container_width=True)
 
         submit_col_2a.button("Copy Update to Clipboard as Markdown",
                             on_click=copy_simple_update_to_clipboard_as_md,
@@ -656,13 +667,22 @@ Submitted by {st.session_state.submitter_name}
 
     submit_col_1, submit_col_2, submit_col_3 = st.columns(3)
 
-    submit_structured_project_log = submit_col_1.button("Submit Update",
-                                                        key="submit_update_structured",
-                                                        type='primary',
-                                                        disabled=False,
-                                                        on_click=run_structured_submit,
-                                                        icon=":material/send:",
-                                                        use_container_width=True)
+    with submit_col_1:
+        with stylable_container(
+            "green",
+            css_styles="""
+            button {
+                background-color: #0A524E;
+                color: white;
+                border: 2px solid white;
+            }"""):
+            submit_structured_project_log = st.button("Submit Update",
+                                                                key="submit_update_structured",
+                                                                type='primary',
+                                                                disabled=False,
+                                                                on_click=run_structured_submit,
+                                                                icon=":material/send:",
+                                                                use_container_width=True)
 
     copy_structured_log = submit_col_2.button("Copy Update to Clipboard as Markdown",
                                     on_click=copy_structured_update_to_clipboard_as_md,
