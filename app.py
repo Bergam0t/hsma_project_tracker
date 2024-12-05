@@ -170,7 +170,7 @@ def project_form_simple_f():
 
     with col_form_right:
 
-        st.write("*Example Updates*")
+        st.subheader("Example Updates")
 
         example_update_1, example_update_2, example_update_3 = st.tabs(["Example 1", "Example 2", "Example 3"])
 
