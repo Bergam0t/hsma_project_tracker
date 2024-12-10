@@ -4,7 +4,6 @@ import pandas as pd
 from supabase import create_client
 from streamlit_gsheets import GSheetsConnection
 from time import sleep
-import pyperclip
 from streamlit_extras.stylable_container import stylable_container
 
 # Use wide layout
@@ -299,37 +298,6 @@ def project_form_simple_f():
                                         key="simple_update",
                                         height=400)
 
-        def copy_simple_update_to_clipboard_as_md():
-
-            simple_log_md = f"""## Project: {st.session_state.project}
-
-Date: {datetime.now().strftime("%A, %B %d %Y at %H:%M")}
-
-Submitted by {st.session_state.submitter_name}
-
-### Project Progress
-
-{st.session_state.simple_update}
-
-            """
-
-            pyperclip.copy(simple_log_md)
-            st.toast("Copied Update To Your Clipboard", icon=":material/thumb_up:")
-
-        def copy_simple_update_to_clipboard_as_pt():
-
-            simple_log_md = f"""Project: {st.session_state.project}
-
-Date: {datetime.now().strftime("%A, %B %d %Y at %H:%M")}
-
-Submitted by {st.session_state.submitter_name}
-
-Project Progress: {st.session_state.simple_update}
-            """
-
-            pyperclip.copy(simple_log_md)
-            st.toast("Copied Update To Your Clipboard", icon=":material/thumb_up:")
-
         submit_col_1a, submit_col_2a, submit_col_3a = st.columns(3)
 
     with submit_col_1a:
@@ -346,18 +314,37 @@ Project Progress: {st.session_state.simple_update}
                                                     on_click=run_simple_submit, icon=":material/send:",
                                                     use_container_width=True)
 
-        submit_col_2a.button("Copy Update to Clipboard as Markdown",
-                            on_click=copy_simple_update_to_clipboard_as_md,
-                            key="copy_simple_md",
-                            icon=":material/content_copy:",
-                            use_container_width=True)
+        with submit_col_2a:
+            with st.expander("Copy update as markdown"):
 
-        submit_col_3a.button("Copy Update to Clipboard as Plain Text",
-                                    on_click=copy_simple_update_to_clipboard_as_pt,
-                                    icon=":material/content_copy:",
-                                    key="copy_simple_pt",
-                                    use_container_width=True)
+                simple_log_md = f"""## Project: {st.session_state.project}
 
+Date: {datetime.now().strftime("%A, %B %d %Y at %H:%M")}
+
+Submitted by {st.session_state.submitter_name}
+
+### Project Progress
+
+{st.session_state.simple_update}
+
+                """
+
+                st.write("Hover over the text below to show the 'copy to clipboard' icon in the top right-hand corner")
+                st.code(simple_log_md)
+
+        with submit_col_3a:
+            with st.expander("Copy update as plain text"):
+
+                simple_log_md = f"""Project: {st.session_state.project}
+
+Date: {datetime.now().strftime("%A, %B %d %Y at %H:%M")}
+
+Submitted by {st.session_state.submitter_name}
+
+Project Progress: {st.session_state.simple_update}
+                """
+                st.write("Hover over the text below to show the 'copy to clipboard' icon in the top right-hand corner")
+                st.code(simple_log_md)
 
         with col_form_left.empty():
             update_message()
@@ -593,7 +580,7 @@ def project_form_structured_f():
         key="structured_other"
     )
 
-    def copy_structured_update_to_clipboard_as_md():
+    def generate_structured_update_to_clipboard_md():
 
         structured_log_md = f"""## Project: {st.session_state.project}
 
@@ -634,34 +621,32 @@ Submitted by {st.session_state.submitter_name}
 {st.session_state.structured_other}
             """
 
-        pyperclip.copy(structured_log_md)
-        st.toast("Copied Update To Your Clipboard", icon=":material/thumb_up:")
+        return structured_log_md
 
-    def copy_structured_update_to_clipboard_as_pt():
+    def generate_structured_update_to_clipboard_pt():
 
-        structured_log_md = f"""Project: {st.session_state.project}
+        structured_log_pt = f"""Project: {st.session_state.project}
 
 Date: {datetime.now().strftime("%A, %B %d %Y at %H:%M")}
 
 Submitted by {st.session_state.submitter_name}
         """
 
-        structured_log_md += f"\nProject Progress: {st.session_state.structured_progress}"
+        structured_log_pt += f"\nProject Progress: {st.session_state.structured_progress}"
 
         if st.session_state.structured_meetings:
-            structured_log_md += f"\n\nProject-related Meetings: {st.session_state.structured_meetings}"
+            structured_log_pt += f"\n\nProject-related Meetings: {st.session_state.structured_meetings}"
 
         if st.session_state.structured_challenges:
-            structured_log_md += f"\n\nChallenges: {st.session_state.structured_challenges}"
+            structured_log_pt += f"\n\nChallenges: {st.session_state.structured_challenges}"
 
         if st.session_state.structured_plans:
-            structured_log_md += f"\n\nNext Steps: {st.session_state.structured_plans}"
+            structured_log_pt += f"\n\nNext Steps: {st.session_state.structured_plans}"
 
         if st.session_state.structured_other:
-            structured_log_md += f"\n\nOther Comments: {st.session_state.structured_other}"
+            structured_log_pt += f"\n\nOther Comments: {st.session_state.structured_other}"
 
-        pyperclip.copy(structured_log_md)
-        st.toast("Copied Update To Your Clipboard", icon=":material/thumb_up:")
+        return structured_log_pt
 
     st.write("---")
 
@@ -684,15 +669,15 @@ Submitted by {st.session_state.submitter_name}
                                                                 icon=":material/send:",
                                                                 use_container_width=True)
 
-    copy_structured_log = submit_col_2.button("Copy Update to Clipboard as Markdown",
-                                    on_click=copy_structured_update_to_clipboard_as_md,
-                                    icon=":material/content_copy:",
-                                    use_container_width=True)
+    with submit_col_2:
+        with st.expander("Copy update as markdown"):
+            st.write("Hover over the text below to show the 'copy to clipboard' icon in the top right-hand corner")
+            st.code(generate_structured_update_to_clipboard_md())
 
-    copy_structured_log = submit_col_3.button("Copy Update to Clipboard as Plain Text",
-                                on_click=copy_structured_update_to_clipboard_as_pt,
-                                icon=":material/content_copy:",
-                                use_container_width=True)
+    with submit_col_3:
+        with st.expander("Copy update as plain text"):
+            st.write("Hover over the text below to show the 'copy to clipboard' icon in the top right-hand corner")
+            st.code(generate_structured_update_to_clipboard_pt())
 
     with st.empty():
         update_message()
