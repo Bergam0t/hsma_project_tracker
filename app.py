@@ -325,7 +325,7 @@ Submitted by {st.session_state.submitter_name}
 
 ### Project Progress
 
-    {st.session_state.simple_update}
+{st.session_state.simple_update}
 
                 """
 
