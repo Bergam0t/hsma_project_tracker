@@ -1,2 +1,2 @@
 xclip
-xsel
+libgtk-3-dev
